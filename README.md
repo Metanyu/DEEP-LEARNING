@@ -1,3 +1,6 @@
+```bash
+uv sync
+```
 Infer guide:
 
 **For classification model (default):**
