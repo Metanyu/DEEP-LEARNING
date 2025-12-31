@@ -38,11 +38,15 @@ class ColorizationInference:
         output = self.model(L_tensor)
         if self.model_type == 'classification':
             ab = self.cls_to_ab(output)
+            target_h, target_w = L_tensor.shape[2], L_tensor.shape[3]
+            ab = F.interpolate(ab, size=(target_h, target_w), mode='bilinear', align_corners=False)
+            ab_norm = ab / 128.0
         else:
             ab = output
-        target_h, target_w = L_tensor.shape[2], L_tensor.shape[3]
-        ab = F.interpolate(ab, size=(target_h, target_w), mode='bilinear', align_corners=False)
-        ab_norm = ab / 128.0
+            target_h, target_w = L_tensor.shape[2], L_tensor.shape[3]
+            if ab.shape[2] != target_h:
+                ab = F.interpolate(ab, size=(target_h, target_w), mode='bilinear', align_corners=False)
+            ab_norm = ab
         rgb_img = lab_to_rgb_for_save(L_tensor[0], ab_norm[0], original_size)
         return rgb_img
     
